@@ -49,6 +49,7 @@ class QuestionService {
     static async addBulkQuestions(payload) {
         try {
             const response = await axios.post(`${API_URL}/question-bulk/`, payload);
+            this.fetchQuestions();
             return response;
         } catch (error) {
             this.handleError(error);
@@ -68,7 +69,7 @@ class QuestionService {
 
     static async getAIQuestions(payload) {
         try {
-            const response = await axios.post(`${API_URL}/ai-questions/generate/`, payload);
+            const response = await axios.post(`${API_URL}/ai-questions/generate/`, payload);            
             return response.data;
         } catch (error) {
             this.handleError(error);

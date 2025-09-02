@@ -33,6 +33,8 @@ class SendInvites extends Component {
     const file = event.target.files[0];
     if (!file) return;
 
+    this.setState({ loading: true });
+
     Papa.parse(file, {
       complete: (result) => {
         const newEmails = result.data
@@ -46,6 +48,7 @@ class SendInvites extends Component {
           return {
             toEmails: [...prevState.toEmails, ...uniqueEmails],
             showModal: false,
+            loading: false
           };
         });
       },

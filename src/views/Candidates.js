@@ -137,7 +137,6 @@ class Candidates extends Component {
                   <th onClick={() => this.handleSort("name")} style={{ cursor: "pointer" }}>
                     Name {sortColumn === "name" ? (sortDirection === "asc" ? "▲" : "▼") : ""}
                   </th>
-                  <th>Age</th>
                   <th>Experience</th>
                   <th>Action</th>
                 </tr>
@@ -147,7 +146,6 @@ class Candidates extends Component {
                   <tr key={candidate.id}>
                     <td>{candidate.email}</td>
                     <td>{candidate.name}</td>                
-                    <td>{candidate.age}</td>
                     <td>{candidate.experience}</td>
                     <td>
                       <button className="btn btn-sm btn-warning mr-2" onClick={() => this.handleShowModal(candidate)}>Edit</button>
@@ -211,18 +209,6 @@ class Candidates extends Component {
                       className="form-control mb-2"
                       placeholder="Email"
                       value={formData.email}
-                      onChange={this.handleChange}
-                      required
-                    />
-                    <Form.Label>Age:</Form.Label>
-                    <input
-                      name="age"
-                      type="number"
-                      min={10}
-                      max={80}
-                      className="form-control mb-2"
-                      placeholder="Age"
-                      value={formData.age}
                       onChange={this.handleChange}
                       required
                     />

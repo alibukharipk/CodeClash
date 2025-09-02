@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Container, Card } from "react-bootstrap";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
+import { questionTypeLabels } from "../../common.js"
 
 const mapStateToProps = (state) => ({
   questions: state.questions.questions
@@ -44,11 +45,6 @@ class Questions extends Component {
     const { questions } = this.props;
     const { selectedQuestionId, skillQuestions, question_type } = this.state;
     const selectedQuestion = skillQuestions.find(q => q.id === selectedQuestionId) || questions[0];
-    const questionTypeLabels = {
-      mcq_single: "Single Choice",
-      mcq_multiple: "Multiple Choice",
-      coding: "Coding"
-    };
 
     return (
       <Container fluid>

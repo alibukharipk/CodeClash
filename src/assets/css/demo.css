@@ -1574,6 +1574,14 @@ button.btn {
     padding: 15px;
   }
 
+  .trust-score-badge.green {
+  background: linear-gradient(145deg, #28a745, #218838); /* green shades */
+}
+
+.trust-score-badge.red {
+  background: linear-gradient(145deg, #dc3545, #c82333); /* red shades */
+}
+
   .company-name {
     font-size: 0.8rem;
     font-weight: 600;
@@ -1633,4 +1641,19 @@ button.btn {
   .no-print {
     display: none !important;
   }
+}
+
+.editor-input {
+  min-height: 150px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 8px;
+  outline: none;
+}
+
+.editor-placeholder {
+  color: #999;
+  position: absolute;
+  pointer-events: none;
+  padding: 10px;
 }

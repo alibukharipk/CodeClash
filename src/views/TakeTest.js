@@ -7,6 +7,7 @@ import TestService from "../services/testService";
 import * as faceapi from 'face-api.js';
 import { Modal, Button, Form } from 'react-bootstrap';
 import MonacoEditor from "@monaco-editor/react";
+import { questionTypeLabels } from "../common.js"
 
 class TakeTest extends Component {
   constructor(props) {
@@ -1040,11 +1041,6 @@ getQuestionById = (questionId) => {
     const currentSection = testSections[currentSectionIndex];
     const question = currentSection.questions[currentQuestionIndex];
     const questionAnswers = answers[question.id] || [];
-    const questionTypeLabels = {
-      mcq_single: "Single Choice",
-      mcq_multiple: "Multiple Choice",
-      coding: "Coding"
-    };
 
     return (
       <div className="card shadow-lg border-0 question-card" style={{ minHeight: '600px' }}>

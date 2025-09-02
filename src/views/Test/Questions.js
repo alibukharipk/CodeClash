@@ -4,6 +4,8 @@ import { Pencil, CheckCircle, XCircle, Clock } from "react-bootstrap-icons";
 import TestService from "services/testService";
 import { withRouter } from "react-router-dom";
 import RingLoader from "react-spinners/RingLoader";
+import { toast } from "react-toastify";
+import { questionTypeLabels } from "../../common.js"
 
 class Questions extends Component {
   constructor(props) {
@@ -19,7 +21,8 @@ class Questions extends Component {
       error: null,
       showModal: false,
       testQuestions: [],
-      previewQuestion: null
+      previewQuestion: null,
+      selectedQuestionsTimelimit: null
     };
   }
 
@@ -75,13 +78,14 @@ class Questions extends Component {
     this.setState((prevState) => {
       const updatedSelection = new Set(prevState.selectedQuestions);
       let updatedTime = prevState.selectedQuestionsTime;
+      this.setState({selectedQuestionsTimelimit: updatedTime + recommendedTime});
 
       if (isChecked) {
         if (updatedTime + recommendedTime <= tempDuration) {
           updatedSelection.add(questionId);
           updatedTime += recommendedTime;
         } else {
-          this.setState({ error: "Questions selection you have made exceeds overall test time limit!" });
+          toast.error(`Questions selection you have made exceeds overall test time limit!`);
           return null;
         }
       } else {
@@ -186,6 +190,17 @@ class Questions extends Component {
               <div className="col-md-9">
                 <Card style={{ padding: "10px" }}>
                   {error && <div className="alert alert-danger">{error}</div>}
+                    <div style={{ textAlign: 'right' }}>
+                      <span 
+                        className={`badge text-secondary mr-1 mb-1 py-1 px-2 ${
+                          this.state.selectedQuestionsTime < this.state.tempDuration
+                            ? 'badge-success'
+                            : 'badge-danger'
+                        }`}
+                      >
+                        <span style={{color: 'white'}}>Time count: <span style={{color: 'black', fontSize: '18px'}}>{this.state.selectedQuestionsTime} mins</span></span>
+                      </span>
+                    </div>
                   <Accordion alwaysOpen>
                     {questions.skills.map((skill, idx) => (
                       <Accordion.Item eventKey={String(idx)} key={idx}>
@@ -255,6 +270,7 @@ class Questions extends Component {
                                   <span className="ml-2">Select All</span>
                                 </th>
                                 <th>Questions ({skill.questions ? skill.questions.length : ""})</th>
+                                <th>Type</th>
                                 <th>Skill</th>
                                 <th>Time</th>
                                 <th>Score</th>
@@ -271,7 +287,8 @@ class Questions extends Component {
                                       onChange={(e) => this.handleCheckboxChange(q.id, e.target.checked, q.recommended_time)}
                                     />
                                   </td>
-                                  <td style={{ width: '600px' }}>{q.name}</td>
+                                  <td style={{ width: '450px' }}>{q.name}</td>
+                                  <td>{questionTypeLabels[q.question_type]}</td>
                                   <td>{skill.name + " (" + skill.level + ")"}</td>
                                   <td>{q.recommended_time}</td>
                                   <td>{q.score}</td>

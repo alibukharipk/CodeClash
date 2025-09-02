@@ -199,7 +199,7 @@ function Header() {
     <Navbar.Collapse id="basic-navbar-nav">
       <Nav className="ml-auto" navbar>
         <Nav.Item>
-          <Nav.Link className="m-0" href="#pablo" onClick={handleLogout}>
+          <Nav.Link className="m-0" onClick={handleLogout}>
             <span className="no-icon">Log out</span>
           </Nav.Link>
         </Nav.Item>

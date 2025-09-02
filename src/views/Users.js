@@ -124,7 +124,7 @@ class Users extends Component {
   };
 
   render() {
-    const { searchQuery, sortColumn, sortDirection, currentPage, itemsPerPage, showModal, formData, userRoles } = this.state;
+    const { searchQuery, sortColumn, sortDirection, currentPage, itemsPerPage, showModal, formData, userRoles, editingUser } = this.state;
     const users = this.getFilteredAndSortedUsers();
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -212,7 +212,7 @@ class Users extends Component {
                 <div className="modal-content">
                   <div className="modal-header">
                     <h5 className="modal-title">
-                      {this.state.editingUser ? "Edit User" : "Add User"}
+                      {editingUser ? "Edit User" : "Add User"}
                     </h5>
                     <button className="close" onClick={this.handleCloseModal}>
                       &times;
@@ -270,34 +270,38 @@ class Users extends Component {
                             required
                           />
                         </div>
-                        <div className="col-md-6">
-                          <Form.Label>Password:</Form.Label> <span className="text-danger">*</span>
-                          <input
-                            name="password"
-                            type="password"
-                            maxLength={100}
-                            minLength={8}
-                            className="form-control mb-2"
-                            placeholder="Password"
-                            value={formData.password}
-                            onChange={this.handleChange}
-                            required
-                          />
-                        </div>
-                        <div className="col-md-6">
-                          <Form.Label>Confirm Password:</Form.Label> <span className="text-danger">*</span>
-                          <input
-                            name="password_confirm"
-                            type="password"
-                            maxLength={100}
-                            minLength={8}
-                            className="form-control mb-2"
-                            placeholder="Confirm Password"
-                            value={formData.confirmPassword}
-                            onChange={this.handleChange}
-                            required
-                          />
-                        </div>
+                        {!editingUser && (
+                          <>
+                            <div className="col-md-6">
+                              <Form.Label>Password:</Form.Label> <span className="text-danger">*</span>
+                              <input
+                                name="password"
+                                type="password"
+                                maxLength={100}
+                                minLength={8}
+                                className="form-control mb-2"
+                                placeholder="Password"
+                                value={formData.password}
+                                onChange={this.handleChange}
+                                required
+                              />
+                            </div>
+                            <div className="col-md-6">
+                              <Form.Label>Confirm Password:</Form.Label> <span className="text-danger">*</span>
+                              <input
+                                name="password_confirm"
+                                type="password"
+                                maxLength={100}
+                                minLength={8}
+                                className="form-control mb-2"
+                                placeholder="Confirm Password"
+                                value={formData.confirmPassword}
+                                onChange={this.handleChange}
+                                required
+                              />
+                            </div>                          
+                          </>
+                        )}
                         <div className="col-md-12">
                           <Form.Label>Role:</Form.Label> <span className="text-danger">*</span>
                           <Form.Control

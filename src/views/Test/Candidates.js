@@ -88,7 +88,7 @@ class Candidates extends Component {
     if (candidate.inviteStatus !== "Invited")
       this.setState({ showModal: true, inviteId: candidate.inviteId });
     else
-      toast.info(`Candidate hasn't given test yet!`);
+      toast.info(`Test not attempted yet!`);
   };
 
   handleCloseModal = () => {

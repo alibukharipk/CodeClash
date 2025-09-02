@@ -3,10 +3,6 @@ import { NavLink, withRouter } from "react-router-dom";
 import { Nav } from "react-bootstrap";
 import { connect } from "react-redux";
 
-const mapStateToProps = (state) => ({
-  role: state.auth.role
-});
-
 class Sidebar extends Component {
   activeRoute(routeName) {
     const { location } = this.props;
@@ -14,7 +10,8 @@ class Sidebar extends Component {
   }
 
   render() {
-    const { color, image, routes, role } = this.props;
+    const { color, image, routes } = this.props;
+    const role = localStorage.getItem("role");
 
     return (
       <div className="sidebar" data-image={image} data-color={color}>
@@ -42,7 +39,7 @@ class Sidebar extends Component {
             {routes.map((prop, key) => {
               const isUsersRoute = prop.name?.toLowerCase() === "users";
 
-              if (!prop.redirect && !(this.props.role !== "admin" && isUsersRoute)) {
+              if (!prop.redirect && !(role !== "admin" && isUsersRoute)) {
                 return (
                   <li className={this.activeRoute(prop.layout + prop.path)} key={key}>
                     <NavLink
@@ -66,4 +63,4 @@ class Sidebar extends Component {
   }
 }
 
-export default connect(mapStateToProps)(withRouter(Sidebar));
+export default withRouter(Sidebar);
