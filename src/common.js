@@ -1,5 +1,7 @@
-export const API_URL = window.location.origin + "/api";
-export const Auth_URL = window.location.origin + "/auth";
+export const API_URL = "https://codeclash.b-wyz.com/api";
+export const Auth_URL = "https://codeclash.b-wyz.com/auth";
+//export const API_URL = "http://127.0.0.1:8000/api";
+//export const Auth_URL = "http://127.0.0.1:8000/auth";
 
 export const formatDuration = (minutes) => {
 const hrs = Math.floor(minutes / 60);

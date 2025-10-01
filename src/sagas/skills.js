@@ -1,10 +1,10 @@
 import { call, put, takeLatest } from "redux-saga/effects";
 import { FETCH_SKILLS_REQUEST, fetchSkillsSuccess, fetchSkillsFailure } from "../actions/skills";
-import axios from "axios";
+import api from "../services/api";
 import { API_URL } from "../common.js";
 
 function fetchSkillsAPI() {
-  return axios.get(`${API_URL}/skills/`);
+  return api.get(`${API_URL}/skills/`);
 }
 
 function* fetchSkills() {

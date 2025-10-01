@@ -1,10 +1,10 @@
 import { call, put, takeLatest } from "redux-saga/effects";
 import { FETCH_QUESTIONS_REQUEST, fetchQuestionsSuccess, fetchQuestionsFailure } from "../actions/questions";
-import axios from "axios";
+import api from "../services/api";
 import { API_URL } from "../common.js";
 
 function fetchQuestionsAPI() {
-  return axios.get(`${API_URL}/questions/`);
+  return api.get(`${API_URL}/questions/`);
 }
 
 function* fetchQuestions() {

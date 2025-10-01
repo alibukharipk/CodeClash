@@ -1,10 +1,10 @@
 import { call, put, takeLatest } from "redux-saga/effects";
 import { FETCH_ROLES_REQUEST, fetchRolesSuccess, fetchRolesFailure } from "../actions/roles";
-import axios from "axios";
+import api from "../services/api";
 import { API_URL } from "../common.js";
 
 function fetchRolesAPI() {
-      return axios.get(`${API_URL}/roles/`);
+      return api.get(`${API_URL}/roles/`);
 
 }
 

@@ -393,9 +393,10 @@ class TestResults extends Component {
                               <thead className="thead-light">
                                 <tr>
                                   <th width="5%">No.</th>
-                                  <th width="45%">Name</th>
-                                  <th width="20%">Skills</th>
-                                  <th width="15%">Score</th>
+                                  <th width="40%">Name</th>
+                                  <th width="15%">Skills</th>
+                                  <th width="15%">Type</th>
+                                  <th width="10%">Score</th>
                                   <th width="15%">Status</th>
                                 </tr>
                               </thead>
@@ -405,6 +406,7 @@ class TestResults extends Component {
                                     <td>{qIndex + 1}</td>
                                     <td>{question.name}</td>
                                     <td>{skill.name} {skill.level}</td>
+                                    <td>{questionTypeLabels[question.type]}</td>
                                     <td>
                                       <span className={question.is_correct ? 'text-success' : 'text-danger'}>
                                         {question.achieved_score}/{question.score}
@@ -456,7 +458,7 @@ class TestResults extends Component {
                 </div>
 
                   <div className="card-body">
-                    <div className="question-description mb-4" dangerouslySetInnerHTML={{ __html: currentQuestion.description }} />
+                    <div style={{overflowY: 'auto', maxHeight: '500px'}} className="question-description mb-4" dangerouslySetInnerHTML={{ __html: currentQuestion.description }} />
                     {currentQuestion.type !== 'coding' ? (
                     <fieldset disabled>
                       <div className="options-container">

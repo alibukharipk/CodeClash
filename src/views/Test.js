@@ -99,7 +99,9 @@ class Test extends React.Component {
               </div>           
             )}   
           <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-                <Link to="/home" className="navbar-brand">Code Clash</Link>
+            <a class="navbar-brand font-weight-bold" href="/home">
+                <span class="mr-2">📚</span>SkillsBeat
+            </a>                
                 <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
                     <span className="navbar-toggler-icon"></span>
                 </button>
@@ -226,8 +228,8 @@ class Test extends React.Component {
                                 <table className="table table-borderless" style={{ border: '1px solid #e2e8f0' }}>
                                   <thead style={{ backgroundColor: '#f7fafc' }}>
                                     <tr>
-                                      <th style={{ color: '#4a5568', fontWeight: 600, borderBottom: '1px solid #e2e8f0' }}>Section</th>
-                                      <th style={{ color: '#4a5568', fontWeight: 600, borderBottom: '1px solid #e2e8f0' }} className="text-right">Questions</th>
+                                      <th style={{ color: 'white', fontWeight: 600, borderBottom: '1px solid #e2e8f0' }}>Section</th>
+                                      <th style={{ color: 'white', fontWeight: 600, borderBottom: '1px solid #e2e8f0' }} className="text-right">Questions</th>
                                     </tr>
                                   </thead>
                                   <tbody>
@@ -298,7 +300,7 @@ class Test extends React.Component {
             </div>
             
             <footer className="footer text-center text-white py-3" style={{ background: "#181c20" }}>
-                <p>&copy; 2025 Code Clash. All Rights Reserved.</p>
+                <p>&copy; 2025 SkillsBeat. All Rights Reserved.</p>
             </footer>
           </div>
         );

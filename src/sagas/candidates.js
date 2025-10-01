@@ -4,11 +4,11 @@ import {
   fetchCandidatesSuccess,
   fetchCandidatesFailure,
 } from "../actions/candidates";
-import axios from "axios";
+import api from "../services/api";
 import { API_URL } from "../common.js";
 
 function fetchCandidatesAPI() {
-  return axios.get(`${API_URL}/candidates/`);
+  return api.get(`${API_URL}/candidates/`);
 }
 
 function* fetchCandidates() {

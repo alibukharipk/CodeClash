@@ -2,7 +2,7 @@ import store from "../store/store";
 import { fetchRolesRequest } from "../actions/roles";
 import { toast } from "react-toastify";
 import { API_URL } from "../common.js";
-import axios from 'axios';
+import api from "./api";
 
 class RoleService {
     static async fetchRoles() {
@@ -11,7 +11,7 @@ class RoleService {
 
     static async addRole(role) {
         try {
-            const response = await axios.post(`${API_URL}/roles/`, role);            
+            const response = await api.post(`${API_URL}/roles/`, role);            
             return response.data;
         } catch (error) {
             this.handleError(error);
@@ -21,7 +21,7 @@ class RoleService {
 
     static async updateRole(id, role) {
         try {
-            const response = await axios.put(`${API_URL}/roles/${id}/`, role);
+            const response = await api.put(`${API_URL}/roles/${id}/`, role);
             return response.data;
         } catch (error) {
             this.handleError(error);
@@ -31,7 +31,7 @@ class RoleService {
 
     static async deleteRole(id) {
         try {
-            await axios.delete(`${API_URL}/roles/${id}/`);
+            await api.delete(`${API_URL}/roles/${id}/`);
             toast.success("Role deleted successfully!");
             store.dispatch(fetchRolesRequest());
         } catch (error) {
@@ -41,7 +41,7 @@ class RoleService {
 
     static async fetchRoleDetails(roleId) {
         try {
-            const response = await axios.get(`${API_URL}/roles/${roleId}/roledetail/`);            
+            const response = await api.get(`${API_URL}/roles/${roleId}/roledetail/`);            
             return response.data;
         } catch (error) {
             this.handleError(error);

@@ -1,12 +1,12 @@
 import { toast } from "react-toastify";
 import { API_URL } from "../common.js";
-import axios from 'axios';
+import api from "./api";
 
 class InviteService {
 
     static async sendInvites(payload) {
         try {
-            await axios.post(`${API_URL}/test-invites/bulk_invite/`, payload);
+            await api.post(`${API_URL}/test-invites/bulk_invite/`, payload);
             toast.success("Invite(s) sent successfully!");
         } catch (error) {
             this.handleError(error);
@@ -16,7 +16,7 @@ class InviteService {
 
     static async getInvitedCandidates(testId) {
         try {
-            const response = await axios.get(`${API_URL}/test-invites/by-test/${testId}/`);
+            const response = await api.get(`${API_URL}/test-invites/by-test/${testId}/`);
             return response.data;
         } catch (error) {
             this.handleError(error);
@@ -26,7 +26,7 @@ class InviteService {
 
     static async GetTestDetailsByInviteId(inviteId) {
         try {
-            const response = await axios.get(`${API_URL}/test-invites/${inviteId}/details/`);
+            const response = await api.get(`${API_URL}/test-invites/${inviteId}/details/`);
             return response.data;
         } catch (error) {
             this.handleError(error);
@@ -36,7 +36,7 @@ class InviteService {
 
     static async getTestVoilations(inviteId) {
         try {
-            const response = await axios.get(`${API_URL}/test-violations/by-invite/${inviteId}/`);
+            const response = await api.get(`${API_URL}/test-violations/by-invite/${inviteId}/`);
             return response.data;
         } catch (error) {
             this.handleError(error);
@@ -46,7 +46,7 @@ class InviteService {
 
     static async GetTestResult(inviteId) {
         try {
-            const response = await axios.get(`${API_URL}/test-invites/${inviteId}/results/`);
+            const response = await api.get(`${API_URL}/test-invites/${inviteId}/results/`);
             return response.data;
         } catch (error) {
             this.handleError(error);
@@ -56,7 +56,7 @@ class InviteService {
 
     static async getById(inviteId) {
         try {
-            const response = await axios.get(`${API_URL}/test-invites/${inviteId}/`);
+            const response = await api.get(`${API_URL}/test-invites/${inviteId}/`);
             return response.data;
         } catch (error) {
             this.handleError(error);
@@ -66,7 +66,7 @@ class InviteService {
 
     static async deleteInvite(id) {
         try {
-            await axios.delete(`${API_URL}/test-invites/${id}/`);
+            await api.delete(`${API_URL}/test-invites/${id}/`);
             toast.success("Invite deleted successfully!");
         } catch (error) {
             this.handleError(error);

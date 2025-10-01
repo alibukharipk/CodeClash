@@ -1,12 +1,13 @@
 import { toast } from "react-toastify";
 import { API_URL } from "../common.js";
 import axios from 'axios';
+import api from "./api";
 
 class TestService {
 
     static async fetchTests() {
         try {
-            const response = await axios.get(`${API_URL}/tests/`);
+            const response = await api.get(`${API_URL}/tests/`);
             return response.data;
         } catch (error) {
             this.handleError(error);
@@ -16,7 +17,7 @@ class TestService {
 
     static async addTest(test) {
         try {
-            const response = await axios.post(`${API_URL}/tests/`, test);
+            const response = await api.post(`${API_URL}/tests/`, test);
             return response.data;
         } catch (error) {
             this.handleError(error);

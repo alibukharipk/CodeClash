@@ -1,6 +1,6 @@
 import { toast } from "react-toastify";
 import { API_URL } from "../common.js";
-import axios from 'axios';
+import api from "./api";
 import store from "../store/store";
 import { fetchQuestionsRequest } from "../actions/questions.js";
 
@@ -11,7 +11,7 @@ class QuestionService {
 
     static async addQuestion(question) {
         try {
-            const response = await axios.post(`${API_URL}/questions/`, question);
+            const response = await api.post(`${API_URL}/questions/`, question);
             return response.data.id;
         } catch (error) {
             if (error.response && error.response.data.name[0].includes('question with this name already exists'))
@@ -28,7 +28,7 @@ class QuestionService {
 
     static async addAnswerChoices(choices) {
         try {
-            await axios.post(`${API_URL}/answer-choices/`, choices);
+            await api.post(`${API_URL}/answer-choices/`, choices);
             this.fetchQuestions();
         } catch (error) {
             this.handleError(error);
@@ -38,7 +38,7 @@ class QuestionService {
 
     static async updateQuestion(id, payload) {
         try {
-            const response = await axios.put(`${API_URL}/questions/${id}/`, payload);            
+            const response = await api.put(`${API_URL}/questions/${id}/`, payload);            
             return response.data;
         } catch (error) {
             this.handleError(error);
@@ -48,7 +48,7 @@ class QuestionService {
 
     static async addBulkQuestions(payload) {
         try {
-            const response = await axios.post(`${API_URL}/question-bulk/`, payload);
+            const response = await api.post(`${API_URL}/question-bulk/`, payload);
             this.fetchQuestions();
             return response;
         } catch (error) {
@@ -59,7 +59,7 @@ class QuestionService {
 
     static async deleteQuestion(id) {
         try {
-            await axios.delete(`${API_URL}/questions/${id}/`);
+            await api.delete(`${API_URL}/questions/${id}/`);
             toast.success("Question deleted successfully!");
             this.fetchQuestions();
         } catch (error) {
@@ -69,7 +69,7 @@ class QuestionService {
 
     static async getAIQuestions(payload) {
         try {
-            const response = await axios.post(`${API_URL}/ai-questions/generate/`, payload);            
+            const response = await api.post(`${API_URL}/ai-questions/generate/`, payload);            
             return response.data;
         } catch (error) {
             this.handleError(error);
