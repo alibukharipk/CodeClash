@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent { label 'windows' }
 
 tools {
     dotnetsdk 'dotnet-sdk-8'
