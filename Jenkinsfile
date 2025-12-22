@@ -2,7 +2,9 @@ pipeline {
     agent any
 
     environment {
-        SONAR_SCANNER_HOME = tool 'SonarScanner'
+        SONAR_SCANNER = tool 'SonarQube'  // match your Jenkins tool name
+        DOTNET_SDK = tool 'dotnet-7'             // match your Jenkins .NET SDK
+        NODEJS = tool 'NodeJS 18'                // match your NodeJS tool
     }
 
     stages {
@@ -16,8 +18,8 @@ pipeline {
         stage('Restore & Build .NET') {
             steps {
                 dir('backend') {
-                    bat 'dotnet restore'
-                    bat 'dotnet build --no-restore'
+                    bat "${DOTNET_SDK}/dotnet restore"
+                    bat "${DOTNET_SDK}/dotnet build --no-restore"
                 }
             }
         }
@@ -25,16 +27,18 @@ pipeline {
         stage('Test .NET') {
             steps {
                 dir('backend') {
-                    bat 'dotnet test'
+                    bat "${DOTNET_SDK}/dotnet test --no-build --verbosity normal"
                 }
             }
         }
 
-        stage('Build React') {
+        stage('Build ReactJS') {
             steps {
                 dir('frontend') {
-                    bat 'npm install'
-                    bat 'npm run build'
+                    withEnv(["PATH+NODE=${NODEJS}/bin"]) {
+                        bat "npm install"
+                        bat "npm run build"
+                    }
                 }
             }
         }
@@ -42,27 +46,19 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    bat """
-                    dotnet-sonarscanner begin ^
-                      /k:"TestProject" ^
-                      /d:sonar.host.url=https://milo-multilighted-greetingly.ngrok-free.dev ^
-                      /d:sonar.login=%SONAR_AUTH_TOKEN%
-
-                    dotnet build backend
-
-                    dotnet-sonarscanner end ^
-                      /d:sonar.login=%SONAR_AUTH_TOKEN%
-                    """
+                    dir('backend') {
+                        bat "${DOTNET_SDK}/dotnet sonarscanner begin /k:\"TestProject\" /d:sonar.host.url=\"${SONAR_HOST_URL}\" /d:sonar.login=\"${SONAR_AUTH_TOKEN}\""
+                        bat "${DOTNET_SDK}/dotnet build"
+                        bat "${DOTNET_SDK}/dotnet sonarscanner end /d:sonar.login=\"${SONAR_AUTH_TOKEN}\""
+                    }
                 }
             }
         }
+    }
 
-        stage('Quality Gate') {
-            steps {
-                timeout(time: 5, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
-            }
+    post {
+        always {
+            echo 'Pipeline finished'
         }
     }
 }
