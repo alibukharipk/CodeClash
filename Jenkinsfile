@@ -14,7 +14,7 @@ tools {
 
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://your-git-repo-url.git'
+                git branch: 'main', url: 'https://github.com/alibukharipk/CodeClash.git'
             }
         }
 
