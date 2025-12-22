@@ -3,7 +3,7 @@ pipeline {
 
  tools {
         dotnet 'dotnet'
-        nodejs 'node'
+        nodejs 'NodeJS'
     }
 
     environment {
