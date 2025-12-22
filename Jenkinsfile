@@ -1,10 +1,13 @@
 pipeline {
     agent any
 
+ tools {
+        dotnet 'dotnet'
+        nodejs 'node'
+    }
+
     environment {
-        SONAR_SCANNER = tool 'SonarQube'  // match your Jenkins tool name
-        DOTNET_SDK = tool 'dotnet-7'             // match your Jenkins .NET SDK
-        NODEJS = tool 'NodeJS 18'                // match your NodeJS tool
+        SONAR_SCANNER_HOME = tool 'SonarScanner'
     }
 
     stages {
