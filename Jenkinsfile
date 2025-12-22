@@ -6,6 +6,10 @@ tools {
     nodejs 'node-18'
 }
 
+    withSonarQubeEnv('SonarQube') {
+    sh 'C:\sonarscanner'
+}
+
     environment {
         SONAR_SCANNER_HOME = tool 'SonarScanner'
     }
