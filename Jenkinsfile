@@ -45,7 +45,7 @@ pipeline {
                     bat """
                     dotnet-sonarscanner begin ^
                       /k:"TestProject" ^
-                      /d:sonar.host.url=http://sonarqube:9000 ^
+                      /d:sonar.host.url=https://milo-multilighted-greetingly.ngrok-free.dev ^
                       /d:sonar.login=%SONAR_AUTH_TOKEN%
 
                     dotnet build backend
