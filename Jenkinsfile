@@ -1,9 +1,9 @@
 pipeline {
     agent any
 
- tools {
+    tools {
         dotnet 'dotnet'
-        nodejs 'NodeJS'
+        nodejs 'node'
     }
 
     environment {
@@ -14,15 +14,15 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                checkout scm
+                git branch: 'main', url: 'https://your-git-repo-url.git'
             }
         }
 
         stage('Restore & Build .NET') {
             steps {
                 dir('backend') {
-                    bat "${DOTNET_SDK}/dotnet restore"
-                    bat "${DOTNET_SDK}/dotnet build --no-restore"
+                    bat 'dotnet restore'
+                    bat 'dotnet build --no-restore'
                 }
             }
         }
@@ -30,18 +30,16 @@ pipeline {
         stage('Test .NET') {
             steps {
                 dir('backend') {
-                    bat "${DOTNET_SDK}/dotnet test --no-build --verbosity normal"
+                    bat 'dotnet test --collect:"XPlat Code Coverage"'
                 }
             }
         }
 
-        stage('Build ReactJS') {
+        stage('Build React') {
             steps {
                 dir('frontend') {
-                    withEnv(["PATH+NODE=${NODEJS}/bin"]) {
-                        bat "npm install"
-                        bat "npm run build"
-                    }
+                    bat 'npm install'
+                    bat 'npm run build'
                 }
             }
         }
@@ -49,19 +47,19 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    dir('backend') {
-                        bat "${DOTNET_SDK}/dotnet sonarscanner begin /k:\"TestProject\" /d:sonar.host.url=\"${SONAR_HOST_URL}\" /d:sonar.login=\"${SONAR_AUTH_TOKEN}\""
-                        bat "${DOTNET_SDK}/dotnet build"
-                        bat "${DOTNET_SDK}/dotnet sonarscanner end /d:sonar.login=\"${SONAR_AUTH_TOKEN}\""
-                    }
+                    bat """
+                    %SONAR_SCANNER_HOME%\\bin\\sonar-scanner
+                    """
                 }
             }
         }
-    }
 
-    post {
-        always {
-            echo 'Pipeline finished'
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
         }
     }
 }
