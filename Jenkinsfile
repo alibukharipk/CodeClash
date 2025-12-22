@@ -1,10 +1,10 @@
 pipeline {
     agent any
 
-    tools {
-        dotnet 'dotnet'
-        nodejs 'node'
-    }
+tools {
+    dotnetsdk 'dotnet-sdk-8'
+    nodejs 'node-18'
+}
 
     environment {
         SONAR_SCANNER_HOME = tool 'SonarScanner'
