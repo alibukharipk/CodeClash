@@ -32,17 +32,19 @@ pipeline {
             }
         }
 
-        stage('OWASP Dependency-Check') {
-            steps {
-                dependencyCheck additionalArguments: '''
-                    --scan .
-                    --format ALL
-                    --failOnCVSS 7
-                    --project "ReactApp"
-                ''',
-                odcInstallation: 'dependency-check'
-            }
-        }
+stage('OWASP Dependency-Check') {
+    tools {
+        dependencyCheck 'dependency-check'  // Name from Global Tool Configuration
+    }
+    steps {
+        dependencyCheck additionalArguments: '''
+            --scan .
+            --format ALL
+            --failOnCVSS 7
+            --project "ReactApp"
+        '''
+    }
+}
     }
 
     post {
