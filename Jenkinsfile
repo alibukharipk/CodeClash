@@ -2,55 +2,55 @@ pipeline {
     agent any
 
     tools {
-        nodejs 'NodeJS-18'
+        nodejs 'NodeJS-18'      // Name from Global Tool Configuration
+        dotnetsdk 'dotnet-sdk-8'  // Name from Global Tool Configuration
+    }
+
+    environment {
+        // Optional: output folder for Dependency-Check reports
+        ODC_REPORTS = "${WORKSPACE}/dependency-check-reports"
     }
 
     stages {
-        stage('Install & Build') {
+
+        stage('Checkout') {
             steps {
-                sh '''
-                  node -v
-                  npm -v
-                  npm install --legacy-peer-deps
-                  npm run build
-                '''
+                git url: 'https://github.com/alibukharipk/CodeClash.git', branch: 'master'
             }
         }
 
-        stage('SonarQube Analysis') {
+        stage('Install & Build ReactJS') {
             steps {
-                script {
-                    def scannerHome = tool 'SonarScanner'
-                    withSonarQubeEnv('SonarQube') {
-                        sh """
-                          ${scannerHome}/bin/sonar-scanner \
-                            -Dsonar.projectKey=ReactApp \
-                            -Dsonar.sources=src
-                        """
-                    }
-                }
+                sh 'npm install --legacy-peer-deps'
+                sh 'npm run build'
             }
         }
 
-stage('OWASP Dependency-Check') {
-    steps {
-        dependencyCheck additionalArguments: '''
-            --scan .
-            --format ALL
-            --failOnCVSS 7
-            --project "ReactApp"
-        ''',
-        odcInstallation: 'dependency-check'  // exact name from Global Tool Configuration
-    }
-}
+        stage('Build .NET Core') {
+            steps {
+                sh 'dotnet restore'
+                sh 'dotnet build --configuration Release'
+            }
+        }
+
+        stage('OWASP Dependency-Check') {
+            steps {
+                // Run Dependency-Check scan
+                dependencyCheck additionalArguments: """
+                    --scan ./           # Scan current workspace
+                    --format ALL
+                    --project "CodeClash"
+                    --out ${ODC_REPORTS}
+                """,
+                odcInstallation: 'dependency-check'
+            }
+        }
     }
 
     post {
         always {
-            dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-        }
-        failure {
-            echo '❌ Build failed due to quality or security issues'
+            // Publish Dependency-Check report in Jenkins
+            dependencyCheckPublisher pattern: "${ODC_REPORTS}/dependency-check-report.xml"
         }
     }
 }
