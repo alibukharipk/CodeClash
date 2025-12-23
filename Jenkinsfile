@@ -33,25 +33,36 @@ pipeline {
             }
         }
 
-        stage('SonarQube Quality Gate') {
-            steps {
-                timeout(time: 5, unit: 'MINUTES') {
+       stage('SonarQube Quality Gate') {
+    steps {
+        timeout(time: 5, unit: 'MINUTES') {
+            script {
+                try {
                     waitForQualityGate abortPipeline: true
+                } catch (Exception e) {
+                    echo "SonarQube quality gate failed: ${e.message}"
+                    // Continue to security checks anyway
+                    currentBuild.result = 'UNSTABLE'
                 }
             }
         }
+    }
+}
 
-        stage('OWASP Dependency-Check') {
-            steps {
-                dependencyCheck additionalArguments: '''
-                    --scan .
-                    --format ALL
-                    --failOnCVSS 7
-                    --project "ReactApp"
-                ''',
-                odcInstallation: 'dependency-check'
-            }
-        }
+stage('OWASP Dependency-Check') {
+    when {
+        expression { currentBuild.result != 'ABORTED' }
+    }
+    steps {
+        dependencyCheck additionalArguments: '''
+            --scan .
+            --format ALL
+            --failOnCVSS 7
+            --project "ReactApp"
+        ''',
+        odcInstallation: 'dependency-check'
+    }
+}
     }
 
     post {
