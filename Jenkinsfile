@@ -1,7 +1,7 @@
 pipeline {
     agent any
 
-      tools {
+    tools {
         nodejs 'NodeJS-18'
     }
 
@@ -10,6 +10,8 @@ pipeline {
         stage('Install & Build') {
             steps {
                 sh '''
+                  node -v
+                  npm -v
                   npm install --legacy-peer-deps
                   npm run build
                 '''
@@ -17,18 +19,19 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
-            def scannerHome = tool 'SonarScanner';
             steps {
-                withSonarQubeEnv() {
-                    sh "${scannerHome}/bin/sonar-scanner"
-                      scannerHome \
-                        -Dsonar.projectKey=react-app \
-                        -Dsonar.sources=src
-                    '''
+                script {
+                    def scannerHome = tool 'SonarScanner'
+                    withSonarQubeEnv('SonarQube') {
+                        sh """
+                          ${scannerHome}/bin/sonar-scanner \
+                            -Dsonar.projectKey=ReactApp \
+                            -Dsonar.sources=src
+                        """
+                    }
                 }
             }
-        }        
-
+        }
 
         stage('SonarQube Quality Gate') {
             steps {
