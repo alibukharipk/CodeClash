@@ -16,17 +16,12 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh '''
-                      SonarScanner \
-                        -Dsonar.projectKey=ReactApp \
-                        -Dsonar.sources=src
-                    '''
-                }
+          stage('SonarQube Analysis') {
+            def scannerHome = tool 'SonarScanner';
+            withSonarQubeEnv() {
+              sh "${scannerHome}/bin/sonar-scanner"
             }
-        }
+          }
 
         stage('SonarQube Quality Gate') {
             steps {
