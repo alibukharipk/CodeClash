@@ -26,7 +26,13 @@ pipeline {
             }
         }
 
-
+        stage('Build .NET Core') {
+            steps {
+                sh 'dotnet restore'
+                sh 'dotnet build --configuration Release'
+            }
+        }
+        
 stage('OWASP Dependency-Check') {
     steps {
         dependencyCheck additionalArguments: """
