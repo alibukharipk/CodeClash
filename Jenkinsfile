@@ -33,24 +33,22 @@ pipeline {
             }
         }
 
-        stage('OWASP Dependency-Check') {
-            steps {
-                // Run Dependency-Check scan
-                dependencyCheck additionalArguments: """
-                    --scan ./           # Scan current workspace
-                    --format ALL
-                    --project "CodeClash"
-                    --out ${ODC_REPORTS}
-                """,
-                odcInstallation: 'dependency-check'
-            }
-        }
+stage('OWASP Dependency-Check') {
+    steps {
+        dependencyCheck additionalArguments: """
+            --scan ./             # Scan workspace
+            --format ALL
+            --project "CodeClash"
+            --out dependency-check-reports
+        """,
+        odcInstallation: 'dependency-check'
+    }
+}
     }
 
-    post {
-        always {
-            // Publish Dependency-Check report in Jenkins
-            dependencyCheckPublisher pattern: "${ODC_REPORTS}/dependency-check-report.xml"
-        }
+post {
+    always {
+        dependencyCheckPublisher pattern: 'dependency-check-reports/*.xml'
     }
+}
 }
