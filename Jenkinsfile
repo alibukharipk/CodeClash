@@ -2,48 +2,47 @@ pipeline {
     agent any
 
     tools {
-        nodejs 'NodeJS-18'
+        nodejs 'NodeJS-18' // Must match NodeJS configured in Jenkins
     }
 
     environment {
-        SONAR_SCANNER_HOME = tool 'SonarScanner'
+        SONARQUBE = 'SonarQube' // Must match the SonarQube server name in Jenkins
     }
 
     stages {
-
         stage('Checkout') {
             steps {
-                git branch: 'master',
-                    url: 'https://github.com/alibukharipk/CodeClash'
+                checkout scm
             }
         }
 
-stage('Install Dependencies') {
-    steps {
-        sh '''
-        npm install --legacy-peer-deps
-        '''
-    }
-}
-
-        stage('Build React App') {
+        stage('Install Dependencies') {
             steps {
-                sh '''
-                npm run build
-                '''
+                sh '  npm install --legacy-peer-deps'
             }
         }
 
-        stage('SonarQube Analysis') {
+        stage('Build') {
+            steps {
+                sh 'npm run build'
+            }
+        }
+
+        stage('SonarQube Scan') {
+            environment {
+                scannerHome = tool 'SonarScanner' // SonarQube Scanner configured in Jenkins
+            }
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    sh '''
-                    ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
-                      -Dsonar.projectKey=react-app \
-                      -Dsonar.sources=src \
-                      -Dsonar.language=js \
-                      -Dsonar.sourceEncoding=UTF-8
-                    '''
+                    sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=react-app -Dsonar.sources=src -Dsonar.host.url=http://localhost:9000 -Dsonar.login=YOUR_SONAR_TOKEN"
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
                 }
             }
         }
