@@ -2,53 +2,55 @@ pipeline {
     agent any
 
     tools {
-        nodejs 'NodeJS-18'      // Name from Global Tool Configuration
-        dotnetsdk 'dotnet-sdk-8'  // Name from Global Tool Configuration
-    }
-
-    environment {
-        // Optional: output folder for Dependency-Check reports
-        ODC_REPORTS = "${WORKSPACE}/dependency-check-reports"
+        nodejs 'NodeJS-18'
     }
 
     stages {
-
-        stage('Checkout') {
+        stage('Install & Build') {
             steps {
-                git url: 'https://github.com/alibukharipk/CodeClash.git', branch: 'master'
+                sh '''
+                  node -v
+                  npm -v
+                  npm install --legacy-peer-deps
+                  npm run build
+                '''
             }
         }
 
-        stage('Install & Build ReactJS') {
+        stage('SonarQube Analysis') {
             steps {
-                sh 'npm install --legacy-peer-deps'
-                sh 'npm run build'
+                script {
+                    def scannerHome = tool 'SonarScanner'
+                    withSonarQubeEnv('SonarQube') {
+                        sh """
+                          ${scannerHome}/bin/sonar-scanner \
+                            -Dsonar.projectKey=ReactApp \
+                            -Dsonar.sources=src
+                        """
+                    }
+                }
             }
         }
 
-        stage('Build .NET Core') {
-            steps {
-                sh 'dotnet restore'
-                sh 'dotnet build --configuration Release'
-            }
-        }
-        
 stage('OWASP Dependency-Check') {
     steps {
-        dependencyCheck additionalArguments: """
-            --scan ./             # Scan workspace
+        dependencyCheck additionalArguments: '''
+            --scan .
             --format ALL
-            --project "CodeClash"
-            --out dependency-check-reports
-        """,
-        odcInstallation: 'dependency-check'
+            --failOnCVSS 7
+            --project "ReactApp"
+        ''',
+        odcInstallation: 'dependency-check'  // exact name from Global Tool Configuration
     }
 }
     }
 
-post {
-    always {
-        dependencyCheckPublisher pattern: 'dependency-check-reports/*.xml'
+    post {
+        always {
+            dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+        }
+        failure {
+            echo '❌ Build failed due to quality or security issues'
+        }
     }
-}
 }
