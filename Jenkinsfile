@@ -34,17 +34,18 @@ pipeline {
 
 stage('OWASP Dependency-Check') {
     steps {
-        // Optional: make sure folder exists
-        sh 'mkdir -p dependency-check-reports'
-
+        // Remove the mkdir command as the plugin should create it
         dependencyCheck additionalArguments: '''
-            --scan package-lock.json
-            --format XML
-            --out dependency-check-reports/dependency-check-report.xml
+            --scan .
+            --format ALL
+            --out ./reports
             --failOnCVSS 7
             --project "ReactJS-SonarTest"
         ''',
         odcInstallation: 'dependency-check'
+        
+        // Check if report was created
+        sh 'ls -la reports/ || echo "No reports directory found"'
     }
 }
     }
