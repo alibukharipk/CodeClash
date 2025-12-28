@@ -32,6 +32,20 @@ pipeline {
             }
         }
 
+stage('Quality Gate') {
+    steps {
+        timeout(time: 5, unit: 'MINUTES') {
+            // Wait for SonarQube analysis to complete and check quality gate
+            script {
+                def qg = waitForQualityGate()
+                if (qg.status != 'OK') {
+                    error "❌ Build failed due to SonarQube Quality Gate: ${qg.status}"
+                }
+            }
+        }
+    }
+}        
+
 stage('OWASP Dependency-Check') {
     steps {
         // Remove the mkdir command as the plugin should create it
