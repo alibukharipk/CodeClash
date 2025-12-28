@@ -18,6 +18,9 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
+            when {
+                expression { env.CHANGE_ID != null } // Only run if this is a PR
+            }
             steps {
                 script {
                     def scannerHome = tool 'SonarScanner'
@@ -25,24 +28,27 @@ pipeline {
                         sh """
                           ${scannerHome}/bin/sonar-scanner \
                             -Dsonar.projectKey=ReactApp \
-                            -Dsonar.sources=src
+                            -Dsonar.sources=src \
+                            -Dsonar.pullrequest.key=${env.CHANGE_ID} \
+                            -Dsonar.pullrequest.branch=${env.CHANGE_BRANCH} \
+                            -Dsonar.pullrequest.base=${env.CHANGE_TARGET}
                         """
                     }
                 }
             }
         }
 
-stage('OWASP Dependency-Check') {
-    steps {
-        dependencyCheck additionalArguments: '''
-            --scan .
-            --format ALL
-            --failOnCVSS 7
-            --project "ReactApp"
-        ''',
-        odcInstallation: 'dependency-check'  // exact name from Global Tool Configuration
-    }
-}
+        stage('OWASP Dependency-Check') {
+            steps {
+                dependencyCheck additionalArguments: '''
+                    --scan .
+                    --format ALL
+                    --failOnCVSS 7
+                    --project "ReactApp"
+                ''',
+                odcInstallation: 'dependency-check'  // exact name from Global Tool Configuration
+            }
+        }
     }
 
     post {
