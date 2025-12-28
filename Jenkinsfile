@@ -35,20 +35,21 @@ pipeline {
 stage('OWASP Dependency-Check') {
     steps {
         dependencyCheck additionalArguments: '''
-            --scan .
-            --format ALL
+            --scan package-lock.json
+            --format XML
+            --out dependency-check-reports
             --failOnCVSS 7
-            --project "ReactApp"
+            --project "ReactJS-SonarTest"
         ''',
-        odcInstallation: 'dependency-check'  // exact name from Global Tool Configuration
+        odcInstallation: 'dependency-check'
     }
 }
     }
 
     post {
-        always {
-            dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-        }
+    always {
+        dependencyCheckPublisher pattern: 'dependency-check-reports/dependency-check-report.xml'
+    }
         failure {
             echo '❌ Build failed due to quality or security issues'
         }
