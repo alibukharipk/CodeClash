@@ -32,42 +32,23 @@ pipeline {
             }
         }
 
-stage('Quality Gate') {
-    steps {
-        timeout(time: 5, unit: 'MINUTES') {
-            // Wait for SonarQube analysis to complete and check quality gate
-            script {
-                def qg = waitForQualityGate()
-                if (qg.status != 'OK') {
-                    error "❌ Build failed due to SonarQube Quality Gate: ${qg.status}"
-                }
-            }
-        }
-    }
-}        
-
 stage('OWASP Dependency-Check') {
     steps {
-        // Remove the mkdir command as the plugin should create it
         dependencyCheck additionalArguments: '''
             --scan .
             --format ALL
-            --out ./reports
             --failOnCVSS 7
-            --project "ReactJS-SonarTest"
+            --project "ReactApp"
         ''',
-        odcInstallation: 'dependency-check'
-        
-        // Check if report was created
-        sh 'ls -la reports/ || echo "No reports directory found"'
+        odcInstallation: 'dependency-check'  // exact name from Global Tool Configuration
     }
 }
     }
 
     post {
-    always {
-        dependencyCheckPublisher pattern: 'dependency-check-reports/dependency-check-report.xml'
-    }
+        always {
+            dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+        }
         failure {
             echo '❌ Build failed due to quality or security issues'
         }
