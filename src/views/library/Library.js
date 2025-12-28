@@ -6,6 +6,7 @@ import QuestionService from "services/questionService";
 import DeleteConfirm from '../../components/Dialogs/DeleteConfirm';
 import RingLoader from "react-spinners/RingLoader";
 import AIQuestions from "./AIQuestions";
+import { questionTypeLabels } from "../../common.js"
 
 const mapStateToProps = (state) => ({
   questions: state.questions.questions
@@ -142,7 +143,7 @@ class Library extends Component {
 
                   <div className="row mb-1">
                     <div className="col-md-3">
-                      <div className="text-muted">Type: <span className="text-dark">{q.question_type}</span></div>
+                      <div className="text-muted">Type: <span className="text-dark">{questionTypeLabels[q.question_type]}</span></div>
                     </div>
                     <div className="col-md-2">
                       <div className="text-muted">Score: <span className="text-dark">{q.score}</span></div>

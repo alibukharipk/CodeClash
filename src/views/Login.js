@@ -7,7 +7,7 @@ const mapStateToProps = (state) => ({
 });
 
 class Login extends Component {
-  state = { username: "", password: "" };
+  state = { username: "", password: "", email: "", password:"" };
 
   handleChange = (e) => {
     this.setState({ [e.target.name]: e.target.value, error: "" });

@@ -7,6 +7,15 @@ import {
   Card,
 } from "react-bootstrap";
 import MonacoEditor from "@monaco-editor/react";
+import { toast } from "react-toastify";
+import TestService from "services/testService.js";
+import { connect } from "react-redux";
+import { withRouter } from "react-router-dom";
+import { questionTypeLabels } from "../../common.js"
+
+const mapStateToProps = (state) => ({
+  accessToken: state.auth.accessToken
+});
 
 class TestResults extends Component {
   constructor(props) {
@@ -61,7 +70,10 @@ class TestResults extends Component {
       },
       trustScore: 0,
       violations: null,
-      screenshots: []
+      screenshots: [],
+      currentQuestionIsCorrect: false,
+      currentQuestionAcheivedPoints: 5,
+      currentQuestionNotes: null
     };
     this.sidebarRef = React.createRef();
   }
@@ -70,7 +82,7 @@ class TestResults extends Component {
     this.loadData();
   }
 
-  loadData = async () => {
+  loadData = async (questionId) => {
     this.setState({ loading: true });
     const testResult = await InviteService.GetTestResult(this.props.inviteId);
     const proctoringSummary = await InviteService.getTestVoilations(this.props.inviteId);
@@ -113,6 +125,19 @@ class TestResults extends Component {
     }
 
     this.calculateTrustScore(proctoringSummary.violations[0]);
+
+    if (questionId)
+    {
+      for (let skill of testResult.skills) {
+        const question = skill.questions.find((q) => q.id === questionId);
+        if (question) 
+        {
+          this.setState({ currentQuestion: question });
+          break;
+        }        
+      }
+    }
+
   };
 
   calculateTrustScore = (violations) => {
@@ -212,18 +237,41 @@ class TestResults extends Component {
   };
 
   openSidebar = (question, showTestResult) => {
-    this.setState({ currentQuestion: question, showTestResult });
+    if(question)
+    {
+      this.setState({ currentQuestion: question, currentQuestionIsCorrect: question.is_correct, 
+        currentQuestionAcheivedPoints: question.achieved_score, currentQuestionNotes: question.grading_notes });
+    }
+
+    this.setState({ showTestResult}); 
     this.sidebarRef.current.openSidebar();
   };
+
+  handleGradeCode = async () => {
+     const { currentQuestion, currentQuestionIsCorrect, currentQuestionAcheivedPoints, currentQuestionNotes } = this.state;
+     
+      if (currentQuestionIsCorrect === null || currentQuestionAcheivedPoints === '') {
+        toast.error("Please select correct/incorrect and provide achieved points!");
+        return;
+      }
+
+      this.setState({ loading: true });
+
+      const payload = {
+        is_correct: currentQuestionIsCorrect,
+        achieved_score: currentQuestionAcheivedPoints,
+        grading_notes: currentQuestionNotes,
+      };
+
+      await TestService.updateTestReponse(currentQuestion.response_id, payload, this.props.accessToken);
+      this.loadData(currentQuestion.id);
+      this.setState({ loading: false });
+
+  }
 
   render() {
     const { testData, activeSkills, isPrintMode, loading, currentQuestion, barChartSeries, barChartOptions, showTestResult, screenshots, violations } = this.state;
     const { candidate, status, score_summary, skills } = testData;
-    const questionTypeLabels = {
-      mcq_single: "Single Choice",
-      mcq_multiple: "Multiple Choice",
-      coding: "Coding"
-    };
 
     return (
 
@@ -244,14 +292,30 @@ class TestResults extends Component {
                     <span className={`badge ${this.getStatusClass(status)}`}>
                       {status}
                     </span>
-                    {violations && (
-                      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '200px', cursor: 'pointer' }}>
-                        <div class="trust-score-badge" onClick={() => this.openSidebar(null, false)}>
-                          <div class="score">{this.state.trustScore}%</div>
-                          <div class="trust-label">Trust Score</div>
+
+                    <div
+                      className="d-flex justify-content-center align-items-center"
+                      style={{ minHeight: "200px", gap: "40px" }}
+                    >
+                      <div
+                          className={`trust-score-badge ${
+                            score_summary.percentage >= 80 ? "green" : "red"
+                          }`}
+                      >
+                        <div className="score">{score_summary.percentage}%</div>
+                        <div className="trust-label">Test Score</div>
+                      </div>                      
+                      {violations && (
+                        <div
+                          style={{cursor: "pointer", }}
+                          className="trust-score-badge"
+                          onClick={() => this.openSidebar(null, false)}
+                        >
+                          <div className="score">{this.state.trustScore}%</div>
+                          <div className="trust-label">Trust Score</div>
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                   <div className='col-md-7'>
                     <div id="chart">
@@ -329,9 +393,10 @@ class TestResults extends Component {
                               <thead className="thead-light">
                                 <tr>
                                   <th width="5%">No.</th>
-                                  <th width="45%">Name</th>
-                                  <th width="20%">Skills</th>
-                                  <th width="15%">Score</th>
+                                  <th width="40%">Name</th>
+                                  <th width="15%">Skills</th>
+                                  <th width="15%">Type</th>
+                                  <th width="10%">Score</th>
                                   <th width="15%">Status</th>
                                 </tr>
                               </thead>
@@ -341,6 +406,7 @@ class TestResults extends Component {
                                     <td>{qIndex + 1}</td>
                                     <td>{question.name}</td>
                                     <td>{skill.name} {skill.level}</td>
+                                    <td>{questionTypeLabels[question.type]}</td>
                                     <td>
                                       <span className={question.is_correct ? 'text-success' : 'text-danger'}>
                                         {question.achieved_score}/{question.score}
@@ -369,31 +435,37 @@ class TestResults extends Component {
               ref={this.sidebarRef}
               title={showTestResult ? currentQuestion ? currentQuestion.name : "" : "Proctoring Summary"}
               width={600}
-              onClose={() => console.log('Sidebar closed')}
             >
               {showTestResult && currentQuestion && (
                 <div className="card shadow-lg border-0 question-card" style={{ minHeight: '600px' }}>
                   <div className="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
                     <span
-                      className={`badge badge-pill px-3 py-2 ${currentQuestion.is_correct ? 'badge-success' : 'badge-danger'
-                        }`}
+                      className={`badge badge-pill px-3 py-2 ${currentQuestion.is_correct ? 'badge-success' : 'badge-danger'}`}
                     >
                       {currentQuestion.is_correct ? 'Correct' : 'Incorrect'}
                     </span>
-                  <span className="badge badge-secondary p-2">
-                      {questionTypeLabels[currentQuestion.type]}
-                    </span>                    
-                  </div>
+
+                    <div className="d-flex">
+                      <span className="badge badge-info p-2">
+                        {questionTypeLabels[currentQuestion.type]}
+                      </span>
+                      {currentQuestion.type === 'coding' && (
+                        <span className="badge badge-secondary p-2 ml-2">
+                          {currentQuestion.coding_language}
+                        </span>                        
+                      )}
+                    </div>
+                </div>
 
                   <div className="card-body">
-                    <div className="question-description mb-4" dangerouslySetInnerHTML={{ __html: currentQuestion.description }} />
+                    <div style={{overflowY: 'auto', maxHeight: '500px'}} className="question-description mb-4" dangerouslySetInnerHTML={{ __html: currentQuestion.description }} />
                     {currentQuestion.type !== 'coding' ? (
                     <fieldset disabled>
                       <div className="options-container">
                         {currentQuestion.all_choices.map(option => (
                           <div key={option.id} className="option-item mb-3" style={{ backgroundColor: option.is_correct ? '#28a745' : '' }}>
                             {currentQuestion.type === 'mcq_single' ? (
-                              <div className="custom-control custom-radio">
+                              <div className="custom-control custom-radio" >
                                 <input
                                   type="radio"
                                   id={`option-${currentQuestion.id}-${option.id}`}
@@ -423,13 +495,86 @@ class TestResults extends Component {
                       </div>
                     </fieldset>
                     ) : (
+                      <>
                           <MonacoEditor
                             height="400px"
-                            defaultLanguage={'csharp'}
+                            defaultLanguage={currentQuestion.coding_language}
                             defaultValue="// Start coding here"
                             value={currentQuestion.response_text}
                             theme="vs-dark"
-                          />
+                          />   
+                          <br></br> 
+                          <div className="form-group row">
+                            <div className="col-md-6">
+                              <div className="form-group">
+                                <b>Mark as:</b>
+                                <div className="custom-control custom-radio">
+                                  <input
+                                    type="radio"
+                                    id="markCorrect"
+                                    name="marking"
+                                    className="custom-control-input"
+                                    checked={this.state.currentQuestionIsCorrect === true}
+                                    onChange={() => this.setState({ currentQuestionIsCorrect: true })}
+                                  />
+                                  <label className="custom-control-label" htmlFor="markCorrect">
+                                    Correct
+                                  </label>
+                                </div>
+                                <div className="custom-control custom-radio">
+                                  <input
+                                    type="radio"
+                                    id="markIncorrect"
+                                    name="marking"
+                                    className="custom-control-input"
+                                    checked={this.state.currentQuestionIsCorrect === false}
+                                    onChange={() => this.setState({ currentQuestionIsCorrect: false })}
+                                  />
+                                  <label className="custom-control-label" htmlFor="markIncorrect">
+                                    Incorrect
+                                  </label>
+                                </div>
+                              </div>
+
+                              <div className="form-group">
+                                <b>Achieved Points (out of {currentQuestion.score}):</b>
+                                <input
+                                  type="number"
+                                  className="form-control"
+                                  min="0"
+                                  max={currentQuestion.score}
+                                  style={{ width: '100px' }}
+                                  value={this.state.currentQuestionAcheivedPoints}
+                                  onChange={(e) => {
+                                    const value = e.target.value;
+                                    const numericValue = parseInt(value, 10);
+
+                                    if (value === '' || (numericValue >= 0 && numericValue <= currentQuestion.score)) {
+                                      this.setState({ currentQuestionAcheivedPoints: value });
+                                    }
+                                  }}
+                                />
+                              </div>
+                            </div>
+
+                            <div className="col-md-6">
+                              <div className="form-group">
+                                <b>Notes:</b>
+                                <textarea
+                                  className="form-control"
+                                  rows="5"
+                                  maxLength={200}
+                                  value={this.state.currentQuestionNotes}
+                                  onChange={(e) => this.setState({ currentQuestionNotes: e.target.value })}
+                                ></textarea>
+                              </div>
+                            </div>
+                          </div>
+
+                          <button className="btn btn-primary" onClick={this.handleGradeCode}>
+                            Submit
+                          </button>                                       
+                      </>                          
                     )}
                   </div>
                 </div>
@@ -531,4 +676,4 @@ class TestResults extends Component {
   }
 }
 
-export default TestResults;
+export default connect(mapStateToProps)(withRouter(TestResults));

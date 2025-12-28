@@ -1,8 +1,8 @@
 import store from "../store/store";
 import { fetchCandidatesRequest } from "../actions/candidates";
 import { API_URL } from "../common.js";
-import axios from 'axios';
 import { toast } from "react-toastify";
+import api from "./api"; 
 
 class CandidateService {
     static async fetchCandidates() {
@@ -11,7 +11,9 @@ class CandidateService {
 
     static async addCandidate(candidate) {        
         try {
-            await axios.post(`${API_URL}/candidates/`, candidate);
+            await api.post(`${API_URL}/candidates/`, candidate, {
+
+            });
             toast.success("Candidate added successfully!");
             store.dispatch(fetchCandidatesRequest());
         } catch (error) {
@@ -22,7 +24,7 @@ class CandidateService {
 
     static async updateCandidate(id, candidate) {
         try {
-            const response = await axios.put(`${API_URL}/candidates/${id}/`, candidate);
+            const response = await api.put(`${API_URL}/candidates/${id}/`, candidate);
             toast.success("Candidate updated successfully!");
             store.dispatch(fetchCandidatesRequest());
             return response.data;
@@ -34,7 +36,7 @@ class CandidateService {
 
     static async deleteCandidate(id) {
         try {
-            await axios.delete(`${API_URL}/candidates/${id}/`);
+            await api.delete(`${API_URL}/candidates/${id}/`);
             store.dispatch(fetchCandidatesRequest());
             toast.success("Candidate deleted successfully!");
         } catch (error) {

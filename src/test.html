@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SonarQube Test</title>
+    <style>
+        /* Inline CSS, usually flagged if overused */
+        body { background-color: red; }
+    </style>
+</head>
+<body>
+    <h1>Welcome to SonarQube Test</h1>
+
+    <!-- Missing alt attribute -->
+    <img src="image.jpg">
+
+    <!-- Deprecated tag -->
+    <center>This is centered text</center>
+
+    <!-- Duplicate IDs -->
+    <div id="duplicate">First div</div>
+    <div id="duplicate">Second div</div>
+
+    <!-- Inline event handler -->
+    <button onclick="alert('Clicked!')">Click me</button>
+
+    <!-- Hardcoded password -->
+    <input type="password" value="123456">
+
+    <!-- Unsafe user input simulation -->
+    <div id="userInput"></div>
+    <script>
+        var userInput = "<img src=x onerror=alert('XSS')>";
+        document.getElementById('userInput').innerHTML = userInput;
+    </script>
+
+</body>
+</html>

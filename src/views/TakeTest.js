@@ -7,6 +7,7 @@ import TestService from "../services/testService";
 import * as faceapi from 'face-api.js';
 import { Modal, Button, Form } from 'react-bootstrap';
 import MonacoEditor from "@monaco-editor/react";
+import { questionTypeLabels } from "../common.js"
 
 class TakeTest extends Component {
   constructor(props) {
@@ -259,7 +260,7 @@ detectCameras = async () => {
     if (this.mediaStream) {
       this.mediaStream.getTracks().forEach(track => track.stop());
     }
-    if (this.audioContext) {
+    if (this.audioContext && this.audioContext.state != "closed") {
       this.audioContext.close();
     }
     this.setState({ isMonitoring: false });
@@ -310,8 +311,12 @@ captureScreenshot = async () => {
   ctx.drawImage(bitmap, 0, 0);
 
   const detections = await faceapi.detectAllFaces(canvas, new faceapi.TinyFaceDetectorOptions());
+  console.log('detections',detections);
   const faceDetected = detections.length > 0;
   const multipleFaces = detections.length > 1;
+  console.log('faceDetected',faceDetected);
+  console.log('multipleFaces',multipleFaces);
+  
 
   if (this.state.screenshotCount < 10) {
       if ((!faceDetected || multipleFaces)) {
@@ -321,6 +326,7 @@ captureScreenshot = async () => {
           });
 
           this.takeAndSendScreenshot(canvas);
+          console.log('No face detected');
         } else {
           // Random screenshot condition    
             const examTimeMs = testTime  * 1000;
@@ -335,8 +341,10 @@ captureScreenshot = async () => {
             }
 
             const nextScreenshotTime = this.randomScreenshotTimestamps[0];
+            console.log('nextScreenshotTime',nextScreenshotTime);
 
             if (now >= nextScreenshotTime) {
+                          console.log('next screen shot taken');
               // Time to take a random screenshot
               this.randomScreenshotTimestamps.shift(); // remove this timestamp
               this.takeAndSendScreenshot(canvas);
@@ -872,6 +880,7 @@ handleCodingAnswerChange = (questionId, code) => {
       );
 
       if (shouldSubmit) {
+        this.stopAllProctoring();
         this.submitTest();
       }
     } else {
@@ -1040,11 +1049,6 @@ getQuestionById = (questionId) => {
     const currentSection = testSections[currentSectionIndex];
     const question = currentSection.questions[currentQuestionIndex];
     const questionAnswers = answers[question.id] || [];
-    const questionTypeLabels = {
-      mcq_single: "Single Choice",
-      mcq_multiple: "Multiple Choice",
-      coding: "Coding"
-    };
 
     return (
       <div className="card shadow-lg border-0 question-card" style={{ minHeight: '600px' }}>
@@ -1059,7 +1063,7 @@ getQuestionById = (questionId) => {
 
         <div className="card-body">
           <h5 className="question-text text-dark font-weight-bold mb-3">{question.name}</h5>
-          <div className="question-description mb-4" dangerouslySetInnerHTML={{ __html: question.description }} />
+          <div className="question-description mb-4" style={{overflowY: 'auto', maxHeight: '500px'}} dangerouslySetInnerHTML={{ __html: question.description }} />
 
       <div className="options-container">
         {question.question_type === 'mcq_single' || question.question_type === 'mcq_multiple' ? (
@@ -1124,7 +1128,7 @@ getQuestionById = (questionId) => {
         {startTest ?
           <div className="wrapper">
             <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-              <span to="/home" className="navbar-brand">Code Clash</span>
+              <span to="/home" className="navbar-brand">SkillsBeat</span>
               <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
                 <span className="navbar-toggler-icon"></span>
               </button>
@@ -1290,13 +1294,12 @@ getQuestionById = (questionId) => {
               </Modal.Footer>
             </Modal>
             <footer className="footer text-center text-white py-3" style={{ background: "#181c20" }}>
-              <p>&copy; 2025 Code Clash. All Rights Reserved.</p>
+              <p>&copy; 2025 SkillsBeat. All Rights Reserved.</p>
             </footer>
           </div>
           :
           <React.Fragment>
-            <Modal show={this.state.showModal} onHide={() => this.setState({ showModal: false })}  show={true}
-              onHide={() => {}} 
+            <Modal show={this.state.showModal} onHide={() => this.setState({ showModal: false })}               
               backdrop="static"
               keyboard={false}>
               {this.renderModalContent()}

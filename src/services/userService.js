@@ -1,7 +1,7 @@
 import store from "../store/store";
 import { fetchUsersRequest } from "../actions/users";
 import { Auth_URL } from "../common.js";
-import axios from 'axios';
+import api from "./api";
 import { toast } from "react-toastify";
 
 class UserService {
@@ -11,7 +11,7 @@ class UserService {
 
     static async addUser(user) {        
         try {
-            await axios.post(`${Auth_URL}/register/`, user);
+            await api.post(`${Auth_URL}/register/`, user);
             toast.success("User added successfully!");
             store.dispatch(fetchUsersRequest());
         } catch (error) {
@@ -22,7 +22,7 @@ class UserService {
 
     static async updateUser(id, user) {
         try {
-            const response = await axios.put(`${Auth_URL}/users/${id}/`, user);
+            const response = await api.put(`${Auth_URL}/users/${id}/`, user);
             toast.success("User updated successfully!");
             store.dispatch(fetchUsersRequest());
             return response.data;
@@ -34,7 +34,7 @@ class UserService {
 
     static async deleteUser(id) {
         try {
-            await axios.delete(`${Auth_URL}/users/${id}/`);
+            await api.delete(`${Auth_URL}/users/${id}/`);
             store.dispatch(fetchUsersRequest());
             toast.success("User deleted successfully!");
         } catch (error) {

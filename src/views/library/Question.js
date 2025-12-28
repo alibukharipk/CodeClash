@@ -162,7 +162,7 @@ class Question extends Component {
     const config = {
       askBeforePasteFromWord: false,
       askBeforePasteHTML: false,
-      height: 300,
+      height: 400,
     }
 
     return (
@@ -195,6 +195,7 @@ class Question extends Component {
                         tabIndex={1} // tabIndex of textarea
                         onBlur={newContent => this.setState({ questionDescription: newContent })} // preferred to use only this option to update the content for performance reasons
                         required
+                        style={{height: '400px'}}
                       />
                     </Form.Group>
 

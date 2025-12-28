@@ -39,10 +39,10 @@ class TestQuestions extends Component {
 
     publishTest  = async () => {
       this.setState({ loading: true }); 
-      const testUpdate = this.state.test;
-      testUpdate.published = true;
-      await TestService.updateTest(testUpdate);
-      this.setState({ test: testUpdate, loading: false }); 
+      const updateTest = await TestService.getTest(this.state.test.id);
+      updateTest.published = true;
+      await TestService.updateTest(updateTest);
+      this.setState({ test: updateTest, loading: false }); 
     };
   
     render() {

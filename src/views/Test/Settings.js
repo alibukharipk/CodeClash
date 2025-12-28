@@ -74,6 +74,7 @@ class Settings extends Component {
     
     this.setState({ loading: true }); 
     await TestService.updateTest(requestData);
+    this.LoadData();
     this.setState({ loading: false }); 
 
   };

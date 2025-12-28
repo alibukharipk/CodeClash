@@ -28,6 +28,8 @@ const authReducer = (state = initialState, action) => {
       localStorage.setItem("accessToken", action.payload.access);
       localStorage.setItem("refreshToken", action.payload.refresh);
       localStorage.setItem("userId", action.payload.user_id);
+      localStorage.setItem("username", action.payload.username);
+      localStorage.setItem("role", action.payload.role_name);
       localStorage.setItem("expireTime", Math.floor(Date.now() / 1000) + 5*60); //5 mins
       return {
         ...state,
@@ -55,6 +57,8 @@ const authReducer = (state = initialState, action) => {
       localStorage.removeItem("refreshToken");
       localStorage.removeItem("userId");
       localStorage.removeItem("expireTime");
+      localStorage.removeItem("username");
+      localStorage.removeItem("role");
       return { ...state, accessToken: null, refreshToken: null, userId: null, username: null, email: null };
 
     default:

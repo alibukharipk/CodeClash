@@ -4,11 +4,11 @@ import {
   fetchUsersSuccess,
   fetchUsersFailure,
 } from "../actions/users";
-import axios from "axios";
+import api from "../services/api";
 import { Auth_URL } from "../common.js";
 
 function fetchUsersAPI() {
-  return axios.get(`${Auth_URL}/users/`);
+  return api.get(`${Auth_URL}/users/`);
 }
 
 function* fetchUsers() {

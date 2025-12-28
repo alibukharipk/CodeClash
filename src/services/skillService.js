@@ -2,7 +2,7 @@ import store from "../store/store";
 import { fetchSkillsRequest } from "../actions/skills";
 import { toast } from "react-toastify";
 import { API_URL } from "../common.js";
-import axios from 'axios';
+import api from "./api";
 
 class SkillService {
     static async fetchSkills() {
@@ -11,7 +11,7 @@ class SkillService {
 
     static async addSkill(skill) {
         try {
-            const response = await axios.post(`${API_URL}/skills/`, skill);
+            const response = await api.post(`${API_URL}/skills/`, skill);
             toast.success("Skill added successfully!");
             store.dispatch(fetchSkillsRequest());
             return response.data;
@@ -23,7 +23,7 @@ class SkillService {
 
     static async updateSkill(id, skill) {
         try {
-            const response = await axios.put(`${API_URL}/skills/${id}/`, skill);            
+            const response = await api.put(`${API_URL}/skills/${id}/`, skill);            
             toast.success("Skill updated successfully!");
             store.dispatch(fetchSkillsRequest());
             return response.data;
@@ -35,7 +35,7 @@ class SkillService {
 
     static async deleteSkill(id) {
         try {
-            await axios.delete(`${API_URL}/skills/${id}/`);
+            await api.delete(`${API_URL}/skills/${id}/`);
             toast.success("Skill deleted successfully!");
             store.dispatch(fetchSkillsRequest());
         } catch (error) {

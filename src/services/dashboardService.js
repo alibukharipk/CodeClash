@@ -1,12 +1,12 @@
 import { toast } from "react-toastify";
 import { API_URL } from "../common.js";
-import axios from 'axios';
+import api from "./api";
 
 class DashboardService {
 
     static async fetchStats() {
         try {
-            const response = await axios.get(`${API_URL}/dashboard/metrics/`);
+            const response = await api.get(`${API_URL}/dashboard/metrics/`);
             return response.data;
         } catch (error) {
             this.handleError(error);

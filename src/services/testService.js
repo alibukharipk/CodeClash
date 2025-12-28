@@ -1,12 +1,13 @@
 import { toast } from "react-toastify";
 import { API_URL } from "../common.js";
 import axios from 'axios';
+import api from "./api";
 
 class TestService {
 
     static async fetchTests() {
         try {
-            const response = await axios.get(`${API_URL}/tests/`);
+            const response = await api.get(`${API_URL}/tests/`);
             return response.data;
         } catch (error) {
             this.handleError(error);
@@ -16,7 +17,7 @@ class TestService {
 
     static async addTest(test) {
         try {
-            const response = await axios.post(`${API_URL}/tests/`, test);
+            const response = await api.post(`${API_URL}/tests/`, test);
             return response.data;
         } catch (error) {
             this.handleError(error);
@@ -26,7 +27,7 @@ class TestService {
 
     static async verifyOTP(payload) {
         try {
-            const response = await axios.post(`${API_URL}/dev/verify-otp/`, payload);
+            const response = await axios.post(`${API_URL}/verify-otp/`, payload);
             return response.data;
         } catch (error) {
             //this.handleError(error);
@@ -118,10 +119,25 @@ class TestService {
         }  
     }
 
+ static async updateTestReponse(responseId, testResponse, accessToken) {
+        try {
+            const response = await axios.post(`${API_URL}/user-responses/${responseId}/grade/`, testResponse, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`
+                }
+            });
+            toast.success("Record updated successfully!");
+            return response.data;
+        } catch (error) {
+            this.handleError(error);
+            return [];
+        }  
+    }    
+
     static async addQuestions(questions)
     {
         try {            
-            await axios.post(`${API_URL}/test-questions/assign-questions/`, questions);
+            await axios.patch(`${API_URL}/test-questions/assign-questions/`, questions);
             toast.success("Successfully added questions against test!");
         } catch (error) {
             this.handleError(error);
