@@ -27,7 +27,7 @@ pipeline {
                     withSonarQubeEnv('SonarQube') {
                         sh """
                           ${scannerHome}/bin/sonar-scanner \
-                            -Dsonar.projectKey=ReactApp \
+                            -Dsonar.projectKey=ReactJS-SonarTest \
                             -Dsonar.sources=src \
                             -Dsonar.pullrequest.key=${env.CHANGE_ID} \
                             -Dsonar.pullrequest.branch=${env.CHANGE_BRANCH} \
@@ -44,7 +44,7 @@ pipeline {
                     --scan .
                     --format ALL
                     --failOnCVSS 7
-                    --project "ReactApp"
+                    --project "ReactJS-SonarTest"
                 ''',
                 odcInstallation: 'dependency-check'  // exact name from Global Tool Configuration
             }
