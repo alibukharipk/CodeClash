@@ -34,6 +34,7 @@ pipeline {
 
 stage('OWASP Dependency-Check') {
     steps {
+        sh 'mkdir -p dependency-check-reports'
         dependencyCheck additionalArguments: '''
             --scan package-lock.json
             --format XML
