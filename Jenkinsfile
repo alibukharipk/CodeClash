@@ -5,6 +5,13 @@ pipeline {
         nodejs 'NodeJS-18'
     }
 
+    environment {
+        // Fallback for regular jobs: set these manually if needed
+        PR_KEY = "${env.CHANGE_ID ?: ''}"
+        PR_BRANCH = "${env.CHANGE_BRANCH ?: ''}"
+        PR_TARGET = "${env.CHANGE_TARGET ?: ''}"
+    }
+
     stages {
         stage('Install & Build') {
             steps {
@@ -19,19 +26,22 @@ pipeline {
 
         stage('SonarQube Analysis') {
             when {
-                expression { env.CHANGE_ID != null } // Only run if this is a PR
+                expression { 
+                    return env.PR_KEY?.trim() != ''
+                }
             }
             steps {
                 script {
+                    echo "Running SonarQube PR scan for PR #${env.PR_KEY}"
                     def scannerHome = tool 'SonarScanner'
                     withSonarQubeEnv('SonarQube') {
                         sh """
                           ${scannerHome}/bin/sonar-scanner \
                             -Dsonar.projectKey=ReactJS-SonarTest \
                             -Dsonar.sources=src \
-                            -Dsonar.pullrequest.key=${env.CHANGE_ID} \
-                            -Dsonar.pullrequest.branch=${env.CHANGE_BRANCH} \
-                            -Dsonar.pullrequest.base=${env.CHANGE_TARGET}
+                            -Dsonar.pullrequest.key=${env.PR_KEY} \
+                            -Dsonar.pullrequest.branch=${env.PR_BRANCH} \
+                            -Dsonar.pullrequest.base=${env.PR_TARGET}
                         """
                     }
                 }
@@ -46,7 +56,7 @@ pipeline {
                     --failOnCVSS 7
                     --project "ReactJS-SonarTest"
                 ''',
-                odcInstallation: 'dependency-check'  // exact name from Global Tool Configuration
+                odcInstallation: 'dependency-check'
             }
         }
     }
