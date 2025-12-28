@@ -34,11 +34,13 @@ pipeline {
 
 stage('OWASP Dependency-Check') {
     steps {
+        // Optional: make sure folder exists
         sh 'mkdir -p dependency-check-reports'
+
         dependencyCheck additionalArguments: '''
             --scan package-lock.json
             --format XML
-            --out dependency-check-reports
+            --out dependency-check-reports/dependency-check-report.xml
             --failOnCVSS 7
             --project "ReactJS-SonarTest"
         ''',
