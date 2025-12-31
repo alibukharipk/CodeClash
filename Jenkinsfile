@@ -38,7 +38,7 @@ stage('OWASP Dependency-Check') {
             --scan .
             --format ALL
             --failOnCVSS 7
-            --project "ReactApp"
+            --project "ReactApp OWASP"
         ''',
         odcInstallation: 'dependency-check'  // exact name from Global Tool Configuration
     }
