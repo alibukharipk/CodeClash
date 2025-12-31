@@ -36,18 +36,19 @@ stage('OWASP Dependency-Check') {
     steps {
         dependencyCheck additionalArguments: '''
             --scan .
-            --format ALL
+            --out dependency-check-report
+            --format XML
             --failOnCVSS 7
             --project "ReactApp OWASP"
         ''',
-        odcInstallation: 'dependency-check'  // exact name from Global Tool Configuration
+        odcInstallation: 'dependency-check'
     }
 }
     }
 
     post {
         always {
-            dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+             dependencyCheckPublisher pattern: 'dependency-check-report/dependency-check-report.xml'
         }
         failure {
             echo '❌ Build failed due to quality or security issues'
